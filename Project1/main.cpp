@@ -7,9 +7,10 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Octree.h"
+#include "BVH.h"
 using namespace std;
 
-Vec getcolor(const Ray &r, Octree *tree, int depth)
+Vec getcolor(const Ray &r, BVH *tree, int depth)
 {
 	vector<Triangle*> list;
 	tree->hit(r, list);
@@ -82,7 +83,8 @@ int main()
 			triList.push_back(meshes.at(i)->triangles.at(j));
 	}
 
-	Octree *root = new Octree(triList, 0);
+	BVH *root = new BVH(triList, 0);
+	//Octree *root = new Octree(triList, 0);
 	
 	Vec fr(-5, 0, 10);
 	Vec to(0, -0.5, 0);

@@ -1,8 +1,8 @@
 #ifndef OCTREE_H
 #define OCTREE_H
 
-#include "Mesh.h"
-#include <iostream>
+#include <vector>
+
 class Octree
 {
 public:
@@ -52,7 +52,6 @@ void Octree::hit(const Ray &r, std::vector<Triangle*> &t)
 
 bool Octree::contains(const Vec &center, const float &le, const Vec &ve)
 {
-
 	if (ve.e[0] >= center.e[0] + le / 2 || ve.e[0] < center.e[0] - le / 2) return false;
 	if (ve.e[1] >= center.e[1] + le / 2 || ve.e[1] < center.e[1] - le / 2) return false;
 	if (ve.e[2] >= center.e[2] + le / 2 || ve.e[2] < center.e[2] - le / 2) return false;
