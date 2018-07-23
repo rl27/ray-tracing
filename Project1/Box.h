@@ -20,6 +20,7 @@ public:
 	bool hitBox(const Ray &r);
 	Vec getCenter();
 	float getMaxLength();
+	int getMaxDimension();
 
 	float bounds[6];
 };
@@ -36,6 +37,15 @@ float Box::getMaxLength()
 	float c = bounds[5] - bounds[4];
 	if (a > b) return (a > c ? a : c);
 	else return (b > c ? b : c);
+}
+
+int Box::getMaxDimension()
+{
+	float a = bounds[1] - bounds[0];
+	float b = bounds[3] - bounds[2];
+	float c = bounds[5] - bounds[4];
+	if (a > b) return (a > c ? 0 : 2);
+	else return (b > c ? 1 : 2);
 }
 
 void Box::expand(const float &a, const float &b, const float &c)

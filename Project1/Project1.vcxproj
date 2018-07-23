@@ -20,15 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
+    <ClInclude Include="BVH.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
-    <ClInclude Include="ObjectList.h" />
     <ClInclude Include="Octree.h" />
-    <ClInclude Include="Plane.h" />
     <ClInclude Include="Ray.h" />
-    <ClInclude Include="Sphere.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Vec.h" />
   </ItemGroup>
@@ -88,8 +86,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Program Files\Assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Assimp\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>./Assimp/include;$(IncludePath)</IncludePath>
+    <LibraryPath>./Assimp/lib/x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

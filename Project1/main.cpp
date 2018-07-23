@@ -7,9 +7,10 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Octree.h"
+#include "BVH.h"
 using namespace std;
 
-Vec getcolor(const Ray &r, Octree *tree, int depth)
+Vec getcolor(const Ray &r, BVH *tree, int depth)
 {
 	vector<Triangle*> list;
 	tree->hit(r, list);
@@ -64,14 +65,6 @@ int main()
 	myfile << "P3\n" << nx << " " << ny << "\n255\n";
 
 	vector<Mesh*> meshes;
-	/*
-	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(2, 0.2, 0.7)));
-	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(3.2, 0.5, 2.5)));
-	meshes.push_back(new Mesh("obj/cube.obj", Vec(-3, 1, -0.7)));
-	meshes.push_back(new Mesh("obj/cube.obj", Vec(2, -1, -0.5)));
-	meshes.push_back(new Mesh("obj/sphere.obj", Vec(0.3, 1, 4)));
-	meshes.push_back(new Mesh("obj/sphere.obj", Vec(2, 3, 1.5)));
-	*/
 	meshes.push_back(new Mesh("obj/sphere.obj", Vec(-0.5,0,0)));
 	meshes.push_back(new Mesh("obj/sphere.obj", Vec(1,1,1)));
 	meshes.push_back(new Mesh("obj/sphere.obj", Vec(1,2,3)));
@@ -81,6 +74,7 @@ int main()
 	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(4,0,0)));
 	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(4,-2,0.5)));
 	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(2,-4,-1)));
+	meshes.push_back(new Mesh("obj/monkey.obj", Vec(-3, 0, -0.5)));
 
 	vector<Triangle*> triList;
 	for (int i = 0; i < meshes.size(); i++)
@@ -89,11 +83,12 @@ int main()
 			triList.push_back(meshes.at(i)->triangles.at(j));
 	}
 
-	Octree *root = new Octree(triList, 0);
+	BVH *root = new BVH(triList, 0);
+	//Octree *root = new Octree(triList, 0);
 	
 	Vec fr(-5, 0, 10);
-	//Vec to(0, 0, 0);
-	Vec to = root->box.getCenter();
+	Vec to(0, -0.5, 0);
+	//Vec to = root->box.getCenter();
 	Vec up(0, 1, 0);
 	float dist_to = (fr - to).length();
 	float aperture = 0;
