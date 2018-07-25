@@ -10,9 +10,20 @@
 #include "BVH.h"
 using namespace std;
 
-Vec getcolor(const Ray &r, BVH *tree, int depth)
+Vec getcolor(const Ray &r, Octree *tree, const Vec &light, int &depth)
 {
 	vector<Triangle*> list;
+	Ray tempray(r.A, light - r.A);
+	tree->hit(tempray, list);
+	hit_record re;
+	for (int i = 0; i < list.size(); i++)
+	{
+		if (list.at(i)->hit(tempray, 1e-3, 1e6, re))
+			return Vec();
+	}
+
+	list.clear();
+	
 	tree->hit(r, list);
 	if (list.size() == 0)
 	{
@@ -38,7 +49,10 @@ Vec getcolor(const Ray &r, BVH *tree, int depth)
 		Ray scatt;
 		Vec att;
 		if (depth < 10 && (rec.mat)->scatter(r, rec, att, scatt))
-			return att * getcolor(scatt, tree, depth + 1);
+		{
+			depth += 1;
+			return att * getcolor(scatt, tree, light, depth);
+		}
 		else
 			return Vec(0, 0, 0);
 	}
@@ -59,12 +73,13 @@ int main()
 
 	int start_time = clock();
 
-	int nx = 400;
-	int ny = 300;
+	int nx = 1024;
+	int ny = 1024;
 	int ns = 2;
 	myfile << "P3\n" << nx << " " << ny << "\n255\n";
 
 	vector<Mesh*> meshes;
+	/*
 	meshes.push_back(new Mesh("obj/sphere.obj", Vec(-0.5,0,0)));
 	meshes.push_back(new Mesh("obj/sphere.obj", Vec(1,1,1)));
 	meshes.push_back(new Mesh("obj/sphere.obj", Vec(1,2,3)));
@@ -75,6 +90,9 @@ int main()
 	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(4,-2,0.5)));
 	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(2,-4,-1)));
 	meshes.push_back(new Mesh("obj/monkey.obj", Vec(-3, 0, -0.5)));
+	*/
+	meshes.push_back(new Mesh("obj/monkey.obj", Vec()));
+	meshes.push_back(new Mesh("obj/monkey.obj", Vec(-3,0,0)));
 
 	vector<Triangle*> triList;
 	for (int i = 0; i < meshes.size(); i++)
@@ -83,11 +101,14 @@ int main()
 			triList.push_back(meshes.at(i)->triangles.at(j));
 	}
 
-	BVH *root = new BVH(triList, 0);
-	//Octree *root = new Octree(triList, 0);
+	triList.push_back(new Triangle(Vec(-10, -2, -10), Vec(-10, -2, 10), Vec(10, -2, 10), new Lambertian(Vec(0.8, 0.6, 0.2))));
+	triList.push_back(new Triangle(Vec(-10, -2, -10), Vec(10, -2, 10), Vec(10, -2, -10), new Lambertian(Vec(0.8, 0.6, 0.2))));
+
+	//BVH *root = new BVH(triList, 0);
+	Octree *root = new Octree(triList, 0);
 	
-	Vec fr(-5, 0, 10);
-	Vec to(0, -0.5, 0);
+	Vec fr(-2, 5, 10);
+	Vec to(-1.5, 0, 0);
 	//Vec to = root->box.getCenter();
 	Vec up(0, 1, 0);
 	float dist_to = (fr - to).length();
@@ -101,10 +122,12 @@ int main()
 			Vec color(0, 0, 0);
 			for (int k = 0; k < ns; k++)
 			{
+				int depth = 1;
 				float u = float(i + (rand() / (RAND_MAX + 1.0))) / float(nx);
 				float v = float(j + (rand() / (RAND_MAX + 1.0))) / float(ny);
 				Ray r = cam.get_ray(u, v);
-				color += getcolor(r, root, 0);
+				color += getcolor(r, root, Vec(2,4,4), depth);
+			
 			}
 			color /= float(ns);
 			

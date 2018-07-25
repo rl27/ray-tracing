@@ -19,7 +19,7 @@ bool Triangle::hit(const Ray &r, float tmin, float tmax, hit_record &rec)
 	Vec pvec = (r.direction()).cross(e1);
 	float det = (pvec).dot(e0);
 
-	if ((det) < 1e-4) return false;
+	if (det < 1e-4) return false;
 
 	float invDet = 1 / det;
 

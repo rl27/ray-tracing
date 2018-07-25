@@ -8,6 +8,14 @@ Mesh::Mesh(const std::string &file, const Vec &off) : offset(off)
 			new Metal(Vec(0.75, 0.75, 0.75), 0)));
 }
 
+Mesh::Mesh(const std::string &file, const Vec &off, Material* mat) : offset(off)
+{
+	importFile(file);
+	for (int i = 0; i < indices.size() / 3; i++)
+		triangles.push_back(new Triangle(vertices.at(indices.at(3 * i)), vertices.at(indices.at(3 * i + 1)), vertices.at(indices.at(3 * i + 2)),
+			mat));
+}
+
 bool Mesh::importFile(const std::string &file)
 {
 	Assimp::Importer importer;

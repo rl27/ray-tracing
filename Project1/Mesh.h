@@ -11,6 +11,7 @@ class Mesh
 {
 public:
 	Mesh(const std::string &file, const Vec &off);
+	Mesh(const std::string &file, const Vec &off, Material* mat);
 
 	bool importFile(const std::string &file);
 	bool getMeshData(const aiMesh *mesh);
