@@ -1,15 +1,10 @@
 #include "Mesh.h"
 
-Mesh::Mesh(const std::string &file, const Vec &off) : offset(off)
-{
-	importFile(file);
-	for (int i = 0; i < indices.size() / 3; i++)
-		triangles.push_back(new Triangle(vertices.at(indices.at(3 * i)), vertices.at(indices.at(3 * i + 1)), vertices.at(indices.at(3 * i + 2)),
-			new Metal(Vec(0.75, 0.75, 0.75), 0)));
-}
-
 Mesh::Mesh(const std::string &file, const Vec &off, Material* mat) : offset(off)
 {
+	if (!mat)
+		mat = new Lambertian(Vec(0.75, 0.75, 0.75));
+
 	importFile(file);
 	for (int i = 0; i < indices.size() / 3; i++)
 		triangles.push_back(new Triangle(vertices.at(indices.at(3 * i)), vertices.at(indices.at(3 * i + 1)), vertices.at(indices.at(3 * i + 2)),

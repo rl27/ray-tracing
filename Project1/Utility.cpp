@@ -3,14 +3,21 @@
 Vec unit_circle()
 {
 	Vec p;
-	do { p = Vec((rand() / (RAND_MAX + 1.0)), (rand() / (RAND_MAX + 1.0)), 0) - Vec(1, 1, 0); } while (p.dot(p) >= 1.0);
+	do { p = Vec((rand() / (RAND_MAX + 1.0)), (rand() / (RAND_MAX + 1.0)), 0) - Vec(1, 1, 0); } while (p.dot(p) > 1.0);
 	return p;
 }
 
 Vec unit_sphere()
 {
 	Vec p;
-	do { p = Vec(rand() / (RAND_MAX + 1.0), rand() / (RAND_MAX + 1.0), rand() / (RAND_MAX + 1.0))*2.0 - Vec(1, 1, 1); } while (p.squared_length() >= 1.0);
+	do { p = Vec(rand() / (RAND_MAX + 1.0), rand() / (RAND_MAX + 1.0), rand() / (RAND_MAX + 1.0))*2.0 - Vec(1, 1, 1); } while (p.squared_length() > 1.0);
+	return p;
+}
+
+Vec hemisphere(Vec n)
+{
+	Vec p;
+	do { p = unit_sphere(); } while (p.dot(n) < 0);
 	return p;
 }
 
@@ -34,4 +41,11 @@ float schlick(float cos, float ref_idx)
 	float r0 = (1 - ref_idx) / (1 + ref_idx);
 	r0 = r0 * r0;
 	return r0 + (1 - r0)*pow((1 - cos), 5);
+}
+
+float clamp(float x)
+{
+	if (x < 0) return 0;
+	if (x > 1) return 1;
+	return x;
 }

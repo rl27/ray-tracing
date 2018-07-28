@@ -10,27 +10,13 @@
 #include "BVH.h"
 using namespace std;
 
-Vec getcolor(const Ray &r, Octree *tree, const Vec &light, int &depth)
+Vec getcolor(const Ray &r, Octree *tree, int depth)
 {
-	vector<Triangle*> list;
-	Ray tempray(r.A, light - r.A);
-	tree->hit(tempray, list);
-	hit_record re;
-	for (int i = 0; i < list.size(); i++)
-	{
-		if (list.at(i)->hit(tempray, 1e-3, 1e6, re))
-			return Vec();
-	}
+	if (depth > 5) return Vec();
 
-	list.clear();
-	
+	vector<Triangle*> list;
 	tree->hit(r, list);
-	if (list.size() == 0)
-	{
-		Vec dir = (r.direction()).unit_vec();
-		float t = 0.5*(dir.e[1] + 1.0);
-		return Vec(1.0, 1.0, 1.0)*(1.0 - t) + Vec(0.5, 0.7, 1.0)*t;
-	}
+	if (list.size() == 0) return Vec();
 
 	hit_record rec;
 	bool hit = false;
@@ -44,55 +30,34 @@ Vec getcolor(const Ray &r, Octree *tree, const Vec &light, int &depth)
 		}
 	}
 
-	if (hit)
+	if (!hit) return Vec();
+
+	Ray scatt;
+	Vec att;
+	if ((rec.mat)->scatter(r, rec, att, scatt))
 	{
-		Ray scatt;
-		Vec att;
-		if (depth < 10 && (rec.mat)->scatter(r, rec, att, scatt))
-		{
-			depth += 1;
-			return att * getcolor(scatt, tree, light, depth);
-		}
-		else
-			return Vec(0, 0, 0);
+		float cos_theta = (scatt.direction()).dot(rec.normal);
+		Vec BRDF = att / M_PI;
+		//return rec.mat->gete() + att * (getcolor(scatt, tree, light, depth + 1));
+		Vec inc = getcolor(scatt, tree, depth + 1);
+		return rec.mat->gete() + (BRDF*inc*cos_theta * 2 * M_PI);
 	}
 	else
-	{
-		Vec dir = (r.direction()).unit_vec();
-		float t = 0.5*(dir.e[1] + 1.0);
-		return Vec(1.0, 1.0, 1.0)*(1.0 - t) + Vec(0.5, 0.7, 1.0)*t;
-	}
+		return Vec();
 }
 
 int main()
 {
 	srand(time(NULL));
 
-	ofstream myfile;
-	myfile.open("output.ppm");
-
 	int start_time = clock();
 
-	int nx = 1024;
-	int ny = 1024;
-	int ns = 2;
-	myfile << "P3\n" << nx << " " << ny << "\n255\n";
+	int nx = 400;
+	int ny = 400;
+	int ns = 10;
 
 	vector<Mesh*> meshes;
-	/*
-	meshes.push_back(new Mesh("obj/sphere.obj", Vec(-0.5,0,0)));
-	meshes.push_back(new Mesh("obj/sphere.obj", Vec(1,1,1)));
-	meshes.push_back(new Mesh("obj/sphere.obj", Vec(1,2,3)));
-	meshes.push_back(new Mesh("obj/sphere.obj", Vec(-1,2,-1)));
-	meshes.push_back(new Mesh("obj/sphere.obj", Vec(2,-1.5,-2)));
-	meshes.push_back(new Mesh("obj/sphere.obj", Vec(-2,-2,1.5)));
-	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(4,0,0)));
-	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(4,-2,0.5)));
-	meshes.push_back(new Mesh("obj/dodecahedron.obj", Vec(2,-4,-1)));
-	meshes.push_back(new Mesh("obj/monkey.obj", Vec(-3, 0, -0.5)));
-	*/
-	meshes.push_back(new Mesh("obj/monkey.obj", Vec()));
-	meshes.push_back(new Mesh("obj/monkey.obj", Vec(-3,0,0)));
+	meshes.push_back(new Mesh("obj/sphere1.obj", Vec(), new Lambertian(Vec(1,0.75,0.5), Vec())));
 
 	vector<Triangle*> triList;
 	for (int i = 0; i < meshes.size(); i++)
@@ -101,19 +66,25 @@ int main()
 			triList.push_back(meshes.at(i)->triangles.at(j));
 	}
 
-	triList.push_back(new Triangle(Vec(-10, -2, -10), Vec(-10, -2, 10), Vec(10, -2, 10), new Lambertian(Vec(0.8, 0.6, 0.2))));
-	triList.push_back(new Triangle(Vec(-10, -2, -10), Vec(10, -2, 10), Vec(10, -2, -10), new Lambertian(Vec(0.8, 0.6, 0.2))));
+	triList.push_back(new Triangle(Vec(-10, -1, -10), Vec(-10, -1, 10), Vec(10, -1, 10), new Lambertian(Vec(0.8, 0.6, 0.2))));
+	triList.push_back(new Triangle(Vec(-10, -1, -10), Vec(10, -1, 10), Vec(10, -1, -10), new Lambertian(Vec(0.8, 0.6, 0.2))));
+	triList.push_back(new Triangle(Vec(0, 6, -30), Vec(20, 6, 15), Vec(-20, 6, -15), new Lambertian(Vec(0.8, 0.6, 0.2), Vec(5,5,5))));
 
 	//BVH *root = new BVH(triList, 0);
 	Octree *root = new Octree(triList, 0);
-	
-	Vec fr(-2, 5, 10);
-	Vec to(-1.5, 0, 0);
+
+	cout << root->box.bounds[0] << " " << root->box.bounds[2] << " " << root->box.bounds[4] << "\n" << root->box.bounds[1] << " " << root->box.bounds[3] << " " << root->box.bounds[5] << " " << endl;
+
+	Vec fr(2, 3, 6);
+	Vec to(0, 0, 0);
 	//Vec to = root->box.getCenter();
 	Vec up(0, 1, 0);
 	float dist_to = (fr - to).length();
-	float aperture = 0;
+	float aperture = 0.5;
 	Camera cam(fr, to, up, 45, float(nx) / float(ny), aperture, dist_to);
+	Vec *c = new Vec[nx * ny];
+
+#pragma omp parallel for schedule(dynamic)// num_threads(4)
 
     for (int j = ny-1; j >= 0; j--)
     {
@@ -122,24 +93,30 @@ int main()
 			Vec color(0, 0, 0);
 			for (int k = 0; k < ns; k++)
 			{
-				int depth = 1;
 				float u = float(i + (rand() / (RAND_MAX + 1.0))) / float(nx);
 				float v = float(j + (rand() / (RAND_MAX + 1.0))) / float(ny);
 				Ray r = cam.get_ray(u, v);
-				color += getcolor(r, root, Vec(2,4,4), depth);
+				color += getcolor(r, root, 0);
 			
 			}
 			color /= float(ns);
-			
-			color = Vec(pow(color.e[0], 1.0 / 2.2), pow(color.e[1], 1.0 / 2.2), pow(color.e[2], 1.0 / 2.2));
+			color = Vec(pow(clamp(color.e[0]), 1.0 / 2.2), pow(clamp(color.e[1]), 1.0 / 2.2), pow(clamp(color.e[2]), 1.0 / 2.2));
 
-			myfile << int(255.99*color.e[0]) << " " << int(255.99*color.e[1]) << " " << int(255.99*color.e[2]) << "\n";
+			//myfile << int(255.99*color.e[0]) << " " << int(255.99*color.e[1]) << " " << int(255.99*color.e[2]) << "\n";
+			c[(ny - j - 1)*nx + i] = Vec(int(255.99*color.e[0]), int(255.99*color.e[1]), int(255.99*color.e[2]));
 	    }
     }
+
+	ofstream myfile;
+	myfile.open("output.ppm");
+	myfile << "P3\n" << nx << " " << ny << "\n255\n";
+	for (int i = 0; i < nx*ny; i++)
+		myfile << c[i].e[0] << " " << c[i].e[1] << " " << c[i].e[2] << "\n";
 
     myfile.close();
 
 	int stop_time = clock();
+	
 	cout << ">> Running time : " << (stop_time - start_time) / 1000.0 << endl;
 	cout << ">> Triangles : " << triList.size() << endl;
 
