@@ -1,22 +1,14 @@
-#ifndef SPHERE_H
-#define SPHERE_H
+#include "Sphere.h"
 
-#include "Object.h"
-
-class Sphere : public Object
+Box Sphere::getBox()
 {
-public:
-	Sphere(Vec c, float r, Material *m) : center(c), radius(r), mat(m) {}
-
-	virtual bool hit(const Ray &r, float tmin, float tmax, hit_record &rec);
-
-	Vec center;
-	float radius;
-	Material *mat;
-};
+	return box;
+}
 
 bool Sphere::hit(const Ray &r, float t_min, float t_max, hit_record &rec)
 {
+	if (!box.hitBox(r)) return false;
+
 	Vec oc = r.origin() - center;
 	float a = (r.direction()).dot(r.direction());
 	float b = 2 * oc.dot(r.direction());
@@ -46,5 +38,3 @@ bool Sphere::hit(const Ray &r, float t_min, float t_max, hit_record &rec)
 	}
 	return false;
 }
-
-#endif

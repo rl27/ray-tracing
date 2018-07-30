@@ -37,9 +37,9 @@ bool Dielectric::scatter(const Ray &r, const hit_record &rec, Vec &att, Ray &sca
 	Vec reflected = reflect(r.direction(), rec.normal);
 	Vec refracted;
 	float ni_over_nt;
-	att = Vec(1.0, 1.0, 1.0); // No absorbtion
+	att = Vec(1.0, 1.0, 1.0);
 	float cos;
-	if ((r.direction()).dot(rec.normal) > 0) // if it = 0, then the direction is perpendicular to the surface.
+	if ((r.direction()).dot(rec.normal) > 0)
 	{
 		out_normal = Vec(-rec.normal.e[0], -rec.normal.e[1], -rec.normal.e[2]);
 		ni_over_nt = ref_idx;

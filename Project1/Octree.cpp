@@ -1,9 +1,9 @@
 #include "Octree.h"
 
-Octree::Octree(std::vector<Triangle*> &t, int d) : hasLeaf(false), depth(d), triangles(t)
+Octree::Octree(std::vector<Object*> &t, int d) : hasLeaf(false), depth(d), triangles(t)
 {
 	for (int i = 0; i < triangles.size(); i++)
-		box.expand(triangles.at(i)->box.bounds);
+		box.expand(triangles.at(i)->getBox().bounds);
 
 	center = box.getCenter();
 	length = box.getMaxLength();
@@ -11,7 +11,7 @@ Octree::Octree(std::vector<Triangle*> &t, int d) : hasLeaf(false), depth(d), tri
 	this->divide();
 }
 
-void Octree::hit(const Ray &r, std::vector<Triangle*> &t)
+void Octree::hit(const Ray &r, std::vector<Object*> *t)
 {
 	if (box.hitBox(r))
 	{
@@ -26,7 +26,7 @@ void Octree::hit(const Ray &r, std::vector<Triangle*> &t)
 		else
 		{
 			for (int i = 0; i < triangles.size(); i++)
-				t.push_back(triangles.at(i));
+				t->push_back(triangles.at(i));
 		}
 	}
 }
@@ -43,14 +43,14 @@ void Octree::divide()
 {
 	if (triangles.size() > 4 && depth < 4)
 	{
-		std::vector<Triangle*> temp;
+		std::vector<Object*> temp;
 
 		int neg[24] = { 1,1,1,1,1,-1,1,-1,1,1,-1,-1,-1,1,1,-1,1,-1,-1,-1,1,-1,-1,-1 };
 		for (int i = 0; i < 8; i++)
 		{
 			for (int j = 0; j < triangles.size(); j++)
 			{
-				if (contains(center + Vec((length / 4)*neg[i * 3], (length / 4)*neg[i * 3 + 1], (length / 4)*neg[i * 3 + 2]), length / 2, triangles.at(j)->center))
+				if (contains(center + Vec((length / 4)*neg[i * 3], (length / 4)*neg[i * 3 + 1], (length / 4)*neg[i * 3 + 2]), length / 2, triangles.at(j)->getBox().center))
 					temp.push_back(triangles.at(j));
 			}
 

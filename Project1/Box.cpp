@@ -31,6 +31,7 @@ void Box::expand(const float &a, const float &b, const float &c)
 	if (b > bounds[3]) bounds[3] = b;
 	if (c < bounds[4]) bounds[4] = c;
 	if (c > bounds[5]) bounds[5] = c;
+	center = this->getCenter();
 }
 
 void Box::expand(float b[6])

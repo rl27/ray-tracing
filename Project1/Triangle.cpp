@@ -9,6 +9,11 @@ Triangle::Triangle(Vec a, Vec b, Vec c, Material *m) : v0(a), v1(b), v2(c), mat(
 	center = box.getCenter();
 }
 
+Box Triangle::getBox()
+{
+	return box;
+}
+
 bool Triangle::hit(const Ray &r, float tmin, float tmax, hit_record &rec)
 {
 	if (!box.hitBox(r)) return false;

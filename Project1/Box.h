@@ -14,6 +14,7 @@ public:
 		bounds[3] = -1e5;
 		bounds[4] = 1e5;
 		bounds[5] = -1e5;
+		center = Vec();
 	}
 	void expand(const float &a, const float &b, const float &c);
 	void expand(float b[6]);
@@ -23,6 +24,7 @@ public:
 	int getMaxDimension();
 
 	float bounds[6];
+	Vec center;
 };
 
 
