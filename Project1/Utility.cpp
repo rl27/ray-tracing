@@ -1,4 +1,16 @@
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include "Utility.h"
+
+Vec random_on_sphere(const Vec &c, const float &r)
+{
+	double theta = (rand() / (RAND_MAX + 1.0)) * M_PI;
+	double phi = (rand() / (RAND_MAX + 1.0)) * 2 * M_PI;
+	double dxr = r * sin(theta) * cos(phi);
+	double dyr = r * sin(theta) * sin(phi);
+	double dzr = r * cos(theta);
+	return Vec(c.e[0] + dxr, c.e[1] + dyr, c.e[2] + dzr);
+}
 
 Vec unit_circle()
 {

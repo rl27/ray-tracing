@@ -1,17 +1,13 @@
 #include "Triangle.h"
 
-Triangle::Triangle(Vec a, Vec b, Vec c, Material *m) : v0(a), v1(b), v2(c), mat(m)
+Triangle::Triangle(Vec a, Vec b, Vec c, Material *m) : v0(a), v1(b), v2(c)
 {
+	mat = m;
 	N = (v1 - v0).cross(v2 - v0);
 	box.expand(v0.e[0], v0.e[1], v0.e[2]);
 	box.expand(v1.e[0], v1.e[1], v1.e[2]);
 	box.expand(v2.e[0], v2.e[1], v2.e[2]);
 	center = box.getCenter();
-}
-
-Box Triangle::getBox()
-{
-	return box;
 }
 
 bool Triangle::hit(const Ray &r, float tmin, float tmax, hit_record &rec)

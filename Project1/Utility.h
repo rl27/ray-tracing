@@ -3,6 +3,7 @@
 
 #include "Vec.h"
 
+Vec random_on_sphere(const Vec &c, const float &r);
 Vec unit_circle();
 Vec unit_sphere();
 Vec hemisphere(Vec n);

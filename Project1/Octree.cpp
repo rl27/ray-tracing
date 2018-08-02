@@ -3,7 +3,7 @@
 Octree::Octree(std::vector<Object*> &t, int d) : hasLeaf(false), depth(d), triangles(t)
 {
 	for (int i = 0; i < triangles.size(); i++)
-		box.expand(triangles.at(i)->getBox().bounds);
+		box.expand(triangles.at(i)->box.bounds);
 
 	center = box.getCenter();
 	length = box.getMaxLength();
@@ -50,7 +50,7 @@ void Octree::divide()
 		{
 			for (int j = 0; j < triangles.size(); j++)
 			{
-				if (contains(center + Vec((length / 4)*neg[i * 3], (length / 4)*neg[i * 3 + 1], (length / 4)*neg[i * 3 + 2]), length / 2, triangles.at(j)->getBox().center))
+				if (contains(center + Vec((length / 4)*neg[i * 3], (length / 4)*neg[i * 3 + 1], (length / 4)*neg[i * 3 + 2]), length / 2, triangles.at(j)->box.center))
 					temp.push_back(triangles.at(j));
 			}
 

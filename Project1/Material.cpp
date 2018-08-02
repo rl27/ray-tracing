@@ -1,25 +1,10 @@
 #include "Material.h"
 
-Vec Lambertian::gete()
-{
-	return emittance;
-}
-
-Vec Metal::gete()
-{
-	return emittance;
-}
-
-Vec Dielectric::gete()
-{
-	return emittance;
-}
-
 bool Lambertian::scatter(const Ray &r, const hit_record &rec, Vec &att, Ray &scatt) const
 {
 	Vec target = rec.p + hemisphere(rec.normal);
 	scatt = Ray(rec.p, target - rec.p);
-	att = albedo;
+	att = albedo * 2 * ((scatt.direction()).unit_vec()).dot(rec.normal);
 	return true;
 }
 

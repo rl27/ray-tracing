@@ -18,9 +18,9 @@ struct hit_record
 class Object
 {
 public:
-    // Pure virtual function. Tests to see if an Object is hit by a Ray.
     virtual bool hit(const Ray &r, float t_min, float t_max, hit_record &rec) = 0;
-	virtual Box getBox() = 0;
+	Material* mat;
+	Box box;
 };
 
 #endif

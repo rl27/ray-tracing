@@ -1,10 +1,5 @@
 #include "Sphere.h"
 
-Box Sphere::getBox()
-{
-	return box;
-}
-
 bool Sphere::hit(const Ray &r, float t_min, float t_max, hit_record &rec)
 {
 	if (!box.hitBox(r)) return false;
