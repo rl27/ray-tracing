@@ -19,6 +19,7 @@ public:
 	}
 
 	virtual bool hit(const Ray &r, float tmin, float tmax, hit_record &rec);
+	virtual Vec random_on_surface();
 
 	Vec center;
 	float radius;

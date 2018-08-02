@@ -1,4 +1,16 @@
+#define _USE_MATH_DEFINES
+#include <math.h>
 #include "Sphere.h"
+
+Vec Sphere::random_on_surface()
+{
+	double theta = (rand() / (RAND_MAX + 1.0)) * M_PI;
+	double phi = (rand() / (RAND_MAX + 1.0)) * 2 * M_PI;
+	double dxr = radius * sin(theta) * cos(phi);
+	double dyr = radius * sin(theta) * sin(phi);
+	double dzr = radius * cos(theta);
+	return Vec(center.e[0] + dxr, center.e[1] + dyr, center.e[2] + dzr);
+}
 
 bool Sphere::hit(const Ray &r, float t_min, float t_max, hit_record &rec)
 {

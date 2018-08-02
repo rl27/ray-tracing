@@ -39,10 +39,8 @@ Vec getcolor(const Ray &r, Octree *tree, int depth)
 		}
 	}
 
-	// DIDN'T HIT?
-	if (!hit) return Vec(0.4, 0.4, 0.4);
-
-	// DID HIT!
+	// DIDN'T HIT ANY OBJECTS
+	if (!hit) return Vec(0.25, 0.25, 0.25);
 
 	Ray scatt;
 	Vec att;
@@ -52,9 +50,9 @@ Vec getcolor(const Ray &r, Octree *tree, int depth)
 	Vec lightSampling(0, 0, 0);
 	for (Object* temp : tree->triangles)
 	{
-		if (temp->mat->emittance.e[0] == 0) continue;
+		if (temp->mat->emittance.e[0] == 0 && temp->mat->emittance.e[1] == 0 && temp->mat->emittance.e[2] == 0) continue;
 
-		Vec lightPos = random_on_sphere(temp->box.center, 3);
+		Vec lightPos = temp->random_on_surface();
 		Vec lightDir = (lightPos - rec.p).unit_vec();
 		Ray toLight(rec.p, lightDir);
 
@@ -77,8 +75,8 @@ Vec getcolor(const Ray &r, Octree *tree, int depth)
 			if (wi > 0)
 			{
 				float cos_a_max = sqrt(1 - 3 * 3 / (rec.p - lightPos).dot(rec.p - lightPos));
-				float omega = 2 * M_PI*(1 - cos_a_max);
-				lightSampling += temp->mat->emittance * wi * omega * M_1_PI;
+				float omega = 2/* * M_PI*/*(1 - cos_a_max);
+				lightSampling += temp->mat->emittance * wi * omega/* * M_1_PI*/;
 			}
 		}
 	}
@@ -106,9 +104,9 @@ int main()
 
 	int start_time = clock();
 
-	int nx = 400;
-	int ny = 300;
-	int ns = 5;
+	int nx = 800;
+	int ny = 600;
+	int ns = 64;
 
 	vector<Object*> objList;
 
@@ -122,25 +120,25 @@ int main()
 	}*/
 
 	objList.push_back(new Sphere(Vec(), 1, new Metal(Vec(1,1,1), 0)));
-	objList.push_back(new Sphere(Vec(3, 0, 0), 1, new Lambertian(Vec(0.75, 0, 0))));
-	objList.push_back(new Sphere(Vec(-3, 0, 0), 1, new Lambertian(Vec(0, 0, 0.75))));
-	objList.push_back(new Sphere(Vec(0, 0, 3), 1, new Lambertian(Vec(0, 0.75, 0))));
-	objList.push_back(new Sphere(Vec(0, 0, -3), 1, new Lambertian(Vec(0.75, 0.75, 0))));
+	objList.push_back(new Sphere(Vec(2.5, 0, 0), 1, new Lambertian(Vec(0.75, 0, 0))));
+	objList.push_back(new Sphere(Vec(-2.5, 0, 0), 1, new Lambertian(Vec(0, 0, 0.75))));
+	objList.push_back(new Sphere(Vec(0, 0, 2.5), 1, new Lambertian(Vec(0, 0.75, 0))));
+	objList.push_back(new Sphere(Vec(0, 0, -2.5), 1, new Lambertian(Vec(0.75, 0.75, 0))));
 
 	objList.push_back(new Sphere(Vec(0, -1e3 - 1, 0), 1e3, new Lambertian(Vec(0.8, 0.6, 0.2))));
 
-	objList.push_back(new Sphere(Vec(4, 8, 0), 3, new Lambertian(Vec(1, 1, 1), Vec(5, 5, 5))));
+	objList.push_back(new Sphere(Vec(4, 8, 0), 3, new Lambertian(Vec(1, 1, 1), Vec(8, 8, 8))));
 
 	//BVH *root = new BVH(objList, 0);
 	Octree *root = new Octree(objList, 0);
 
-	Vec fr(3, 5, 8);
+	Vec fr(4, 3.5, 8);
 	//Vec fr(2, 1.8, 5);
 	Vec to(0, 0, 0);
 	//Vec to = root->box.getCenter();
 	Vec up(0, 1, 0);
 	float dist_to = (fr - to).length();
-	float aperture = 0.5;
+	float aperture = 0.7;
 	Camera cam(fr, to, up, 45, float(nx) / float(ny), aperture, dist_to);
 	Vec *c = new Vec[nx * ny];
 

@@ -19,6 +19,7 @@ class Object
 {
 public:
     virtual bool hit(const Ray &r, float t_min, float t_max, hit_record &rec) = 0;
+	virtual Vec random_on_surface() { return Vec(); }
 	Material* mat;
 	Box box;
 };
