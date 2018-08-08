@@ -35,6 +35,13 @@ public:
     inline float dot(const Vec &v) const { return e[0]*v.e[0] + e[1]*v.e[1] + e[2]*v.e[2]; }
     inline Vec cross(const Vec &v) const { return Vec( (e[1]*v.e[2] - e[2]*v.e[1]), (e[2]*v.e[0] - e[0]*v.e[2]), (e[0]*v.e[1] - e[1]*v.e[0])); }
     inline Vec unit_vec() const { return *this / (this->length()); }
+	float maximum() const
+	{
+		float max = e[0];
+		if (e[1] > max) max = e[1];
+		if (e[2] > max) max = e[2];
+		return max;
+	}
 
     float e[3];
 };

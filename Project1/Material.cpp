@@ -4,7 +4,7 @@ bool Lambertian::scatter(const Ray &r, const hit_record &rec, Vec &att, Ray &sca
 {
 	Vec target = rec.p + hemisphere(rec.normal);
 	scatt = Ray(rec.p, target - rec.p);
-	att = albedo * 2 * ((scatt.direction()).unit_vec()).dot(rec.normal);
+	att = albedo;// * 2 * ((scatt.direction()).unit_vec()).dot(rec.normal);
 	return true;
 }
 

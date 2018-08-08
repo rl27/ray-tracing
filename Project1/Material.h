@@ -9,12 +9,13 @@ class Material
 public:
 	virtual bool scatter(const Ray &r, const hit_record &rec, Vec &att, Ray &scatt) const = 0;
 	Vec emittance;
+	bool isDiffuse = false;
 };
 
 class Lambertian : public Material
 {
 public:
-	Lambertian(const Vec &a, const Vec &e = Vec(0,0,0)) { albedo = a; emittance = e; }
+	Lambertian(const Vec &a, const Vec &e = Vec(0, 0, 0)) { albedo = a; emittance = e; isDiffuse = true; }
 
 	virtual bool scatter(const Ray &r, const hit_record &rec, Vec &att, Ray &scatt) const;
 	Vec albedo;
